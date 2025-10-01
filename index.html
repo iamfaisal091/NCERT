@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="मेरा ब्लॉग - टेक, पर्सनल, और क्रिएटिव विचारों का संग्रह">
+    <meta name="keywords" content="ब्लॉग, टेक, पर्सनल, हिंदी">
+    <meta name="author" content="तुम्हारा_नाम">
+    <meta property="og:title" content="मेरा ब्लॉग">
+    <meta property="og:description" content="मेरे विचारों और अनुभवों को पढ़ें।">
+    <meta property="og:image" content="https://source.unsplash.com/random/1200x630?blog">
+    <meta property="og:url" content="तुम्हारा_वेबसाइट_URL">
+    <title>मेरा ब्लॉग</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f4f4f4; color: #333; }
+        header { background: linear-gradient(90deg, #2c3e50, #3498db); color: white; text-align: center; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        header button { background: #fff; color: #3498db; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        header button:hover { background: #eee; }
+        #authStatus { font-size: 1em; margin-top: 10px; }
+        #postList { max-width: 800px; margin: 20px auto; padding: 0 10px; }
+        .post-teaser { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .post-teaser h2 { font-size: 1.8em; margin-bottom: 10px; }
+        .post-teaser p { margin-bottom: 10px; line-height: 1.6; }
+        .post-teaser button { background: #3498db; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        .post-teaser button:hover { background: #2980b9; }
+        #authModal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 300px; }
+        #authModal input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+        #authModal button { background: #3498db; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer; width: 100%; }
+        #authModal button:hover { background: #2980b9; }
+        #authModal .toggle { text-align: center; margin-top: 10px; cursor: pointer; color: #3498db; }
+        footer { background: #333; color: white; text-align: center; padding: 10px; width: 100%; }
+        @media (max-width: 600px) { header h1 { font-size: 1.8em; } .post-teaser h2 { font-size: 1.5em; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>मेरा ब्लॉग</h1>
+        <button id="loginBtn">लॉगिन</button>
+        <button id="signupBtn">साइनअप</button>
+        <button id="logoutBtn" style="display: none;">लॉगआउट</button>
+        <p id="authStatus"></p>
+    </header>
+
+    <div id="postList"></div>
+
+    <div id="authModal">
+        <h2 id="modalTitle">लॉगिन</h2>
+        <input type="text" id="username" placeholder="यूजरनेम">
+        <input type="password" id="password" placeholder="पासवर्ड">
+        <input type="password" id="confirmPassword" placeholder="कन्फर्म पासवर्ड" style="display: none;">
+        <button id="authSubmit">सबमिट</button>
+        <p class="toggle" id="toggleAuth">साइनअप पर जाएं</p>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 मेरा ब्लॉग। सभी अधिकार सुरक्षित।</p>
+    </footer>
+
+    <!-- Firebase SDK (लेटेस्ट) -->
+    <script type="module">
+        // Firebase SDK इम्पोर्ट
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        // Firebase कॉन्फिगरेशन (तुम्हारा पिछला कॉन्फिग)
+        const firebaseConfig = {
+  apiKey: "AIzaSyBHlGDDx5er4Sj_fqigwKd5CKWklkytq2E",
+  authDomain: "groupchat018.firebaseapp.com",
+  projectId: "groupchat018",
+  storageBucket: "groupchat018.firebasestorage.app",
+  messagingSenderId: "553068483821",
+  appId: "1:553068483821:web:e6220d65c7080b115fe8e4"
+};
+
+        // Firebase शुरू करें
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        let posts = [];
+        let isSignup = false;
+        const fakeDomain = '@myblog.com';
+
+        // JSON से पोस्ट्स फेच करें
+        async function fetchPosts() {
+            try {
+                const response = await fetch('posts.json');
+                if (!response.ok) throw new Error('JSON फेच करने में समस्या');
+                posts = await response.json();
+                displayPosts();
+            } catch (error) {
+                console.error('JSON फेच एरर:', error);
+                document.getElementById('postList').innerHTML = '<p>पोस्ट्स लोड करने में त्रुटि।</p>';
+            }
+        }
+
+        // पोस्ट्स दिखाएं (टीजर)
+        function displayPosts() {
+            let postList = document.getElementById('postList');
+            postList.innerHTML = '';
+            posts.forEach(post => {
+                postList.innerHTML += `
+                    <div class="post-teaser">
+                        <h2>${post.title}</h2>
+                        <p>${post.excerpt}</p>
+                        <button onclick="handleReadMore(${post.id})">रीड मोर</button>
+                    </div>
+                `;
+            });
+        }
+
+        // रीड मोर हैंडल
+        function handleReadMore(id) {
+            if (auth.currentUser) {
+                window.location.href = `post.html?id=${id}`;
+            } else {
+                showAuthModal(false);
+            }
+        }
+
+        // ऑथ मॉडल दिखाएं
+        function showAuthModal(signupMode) {
+            isSignup = signupMode;
+            document.getElementById('modalTitle').innerText = isSignup ? 'साइनअप' : 'लॉगिन';
+            document.getElementById('confirmPassword').style.display = isSignup ? 'block' : 'none';
+            document.getElementById('toggleAuth').innerText = isSignup ? 'लॉगिन पर जाएं' : 'साइनअप पर जाएं';
+            document.getElementById('authModal').style.display = 'block';
+        }
+
+        // ऑथ सबमिट
+        document.getElementById('authSubmit').addEventListener('click', async () => {
+            let username = document.getElementById('username').value;
+            let password = document.getElementById('password').value;
+            let confirmPassword = document.getElementById('confirmPassword').value;
+            let email = username + fakeDomain;
+
+            try {
+                if (isSignup) {
+                    if (password !== confirmPassword) {
+                        alert('पासवर्ड मैच नहीं कर रहे!');
+                        return;
+                    }
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    alert('साइनअप सफल!');
+                    document.getElementById('authModal').style.display = 'none';
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    alert('लॉगिन सफल!');
+                    document.getElementById('authModal').style.display = 'none';
+                }
+            } catch (error) {
+                alert('एरर: ' + error.message);
+            }
+        });
+
+        // टॉगल ऑथ मोड
+        document.getElementById('toggleAuth').addEventListener('click', () => {
+            showAuthModal(!isSignup);
+        });
+
+        // बटन इवेंट्स
+        document.getElementById('loginBtn').addEventListener('click', () => showAuthModal(false));
+        document.getElementById('signupBtn').addEventListener('click', () => showAuthModal(true));
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await signOut(auth);
+            alert('लॉगआउट सफल!');
+        });
+
+        // ऑथ स्टेट चेंज
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                document.getElementById('authStatus').innerText = `स्वागत है, ${user.email.split('@')[0]}!`;
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('signupBtn').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('authStatus').innerText = 'आप लॉग्ड इन नहीं हैं।';
+                document.getElementById('loginBtn').style.display = 'inline-block';
+                document.getElementById('signupBtn').style.display = 'inline-block';
+                document.getElementById('logoutBtn').style.display = 'none';
+            }
+        });
+
+        // शुरुआत में पोस्ट्स फेच करें
+        fetchPosts();
+    </script>
+</body>
+</html>
