@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>philoshphy of everything</title>
+  <style>
+    /* रिसेट और बेसिक स्टाइल */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      background-color: #f4f4f4;
+      color: #333;
+      line-height: 1.6;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* हेडर */
+    header {
+      background: linear-gradient(90deg, #1a73e8, #4285f4);
+      color: white;
+      padding: 15px 20px;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .hamburger {
+      display: none;
+      font-size: 2rem;
+      cursor: pointer;
+    }
+
+    /* साइडबार */
+    .sidebar {
+      background: #1a1a1a;
+      color: white;
+      width: 70px; /* डिफॉल्ट स्लिम */
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding-top: 70px;
+      transition: width 0.3s ease;
+      z-index: 999;
+      overflow: hidden;
+    }
+    .sidebar:hover {
+      width: 200px; /* होवर पर विस्तार */
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 20px 0;
+    }
+    .sidebar li {
+      margin-bottom: 10px;
+    }
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      padding: 10px 15px;
+      font-size: 1rem;
+      color: white;
+      transition: background 0.3s;
+    }
+    .sidebar a:hover {
+      background: #4285f4;
+    }
+    .sidebar .icon {
+      font-size: 1.2rem;
+      width: 40px;
+      text-align: center;
+    }
+    .sidebar .text {
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .sidebar:hover .text {
+      opacity: 1;
+    }
+
+    /* मुख्य कंटेंट */
+    .main-content {
+      margin-left: 70px; /* साइडबार की डिफॉल्ट चौड़ाई */
+      padding: 80px 20px 20px;
+      transition: margin-left 0.3s ease;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .blog-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .blog-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .blog-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+    .blog-image {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-bottom: 2px solid #1a73e8;
+    }
+    .blog-content {
+      padding: 15px;
+    }
+    .blog-title {
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .blog-description {
+      font-size: 1rem;
+      color: #666;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* फुटर */
+    footer {
+      background: linear-gradient(90deg, #1a73e8, #4285f4);
+      color: white;
+      text-align: center;
+      padding: 15px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      left: 0;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* रेस्पॉन्सिव डिज़ाइन */
+    @media (max-width: 768px) {
+      .hamburger {
+        display: block;
+      }
+      .sidebar {
+        width: 250px;
+        transform: translateX(-100%);
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      .sidebar:hover {
+        width: 250px; /* मोबाइल पर होवर इफेक्ट नहीं */
+      }
+      .sidebar .text {
+        opacity: 1; /* मोबाइल पर टेक्स्ट हमेशा दिखे */
+      }
+      .main-content {
+        margin-left: 0;
+        padding-top: 60px;
+      }
+      header {
+        padding: 10px 15px;
+      }
+      .logo {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- हेडर -->
+  <header>
+    <div class="logo">Just calm down</div>
+    <div class="hamburger" id="hamburger">&#9776;</div>
+  </header>
+
+  <!-- साइडबार -->
+  <nav class="sidebar" id="sidebar">
+    <ul>
+      <li><a href="index.html"><span class="icon">🏠</span><span class="text">होम</span></a></li>
+      <li><a href="#"><span class="icon">ℹ️</span><span class="text">अबाउट</span></a></li>
+      <li><a href="#"><span class="icon">📞</span><span class="text">कॉन्टैक्ट</span></a></li>
+      <li><a href="#"><span class="icon">📝</span><span class="text">ब्लॉग्स</span></a></li>
+    </ul>
+  </nav>
+
+  <!-- मुख्य कंटेंट -->
+  <main class="main-content">
+    <div class="container">
+      <h1>😇</h1>
+      <div class="blog-list" id="blogList"></div>
+    </div>
+  </main>
+
+  <!-- फुटर -->
+  <footer>
+    &copy; 2025 मेरा ब्लॉग। सभी अधिकार सुरक्षित।
+  </footer>
+
+  <script>
+    // हैमबर्गर मेनू टॉगल
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    hamburger.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+    // JSON डेटा फेच करना
+    fetch('data.json')
+      .then(response => response.json())
+      .then(data => {
+        const blogList = document.getElementById('blogList');
+        data.forEach(blog => {
+          const blogCard = document.createElement('div');
+          blogCard.className = 'blog-card';
+          blogCard.innerHTML = `
+            <a href="blog.html?id=${blog.id}">
+              <img src="${blog.image}" alt="${blog.title}" class="blog-image">
+            </a>
+            <div class="blog-content">
+              <h2 class="blog-title">${blog.title}</h2>
+              <p class="blog-description">${blog.description}</p>
+            </div>
+          `;
+          blogList.appendChild(blogCard);
+        });
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  </script>
+</body>
+</html>
