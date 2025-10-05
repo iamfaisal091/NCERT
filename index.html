@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ब्लॉग वेबसाइट</title>
+  <style>
+    /* रिसेट और बेसिक स्टाइल */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    body {
+      background-color: #e0e7ff;
+      color: #1f2937;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* हेडर */
+    header {
+      background: linear-gradient(90deg, #4f46e5, #7c3aed);
+      color: white;
+      padding: 15px 20px;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .hamburger {
+      display: none;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .hamburger:hover {
+      transform: rotate(90deg);
+    }
+
+    /* साइडबार */
+    .sidebar {
+      background: #111827;
+      color: white;
+      width: 80px;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding-top: 80px;
+      transition: width 0.3s ease;
+      z-index: 999;
+      overflow: hidden;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+    .sidebar:hover {
+      width: 220px;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 20px 0;
+    }
+    .sidebar li {
+      margin-bottom: 15px;
+    }
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      font-size: 1.1rem;
+      color: white;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .sidebar a:hover {
+      background: #4f46e5;
+      transform: translateX(5px);
+    }
+    .sidebar .icon {
+      font-size: 1.4rem;
+      width: 40px;
+      text-align: center;
+    }
+    .sidebar .text {
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .sidebar:hover .text {
+      opacity: 1;
+    }
+
+    /* डाउनलोड सेक्शन */
+    .offline-section {
+      position: fixed;
+      top: 80px;
+      left: 80px;
+      width: 320px;
+      height: calc(100vh - 80px);
+      background: #ffffff;
+      padding: 20px;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 998;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
+      border-radius: 0 8px 8px 0;
+    }
+    .offline-section.active {
+      transform: translateX(0);
+    }
+    .offline-section h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: #1f2937;
+      border-bottom: 2px solid #4f46e5;
+      padding-bottom: 10px;
+    }
+    .offline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .offline-blog {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: transform 0.3s, background 0.3s;
+    }
+    .offline-blog:hover {
+      transform: translateY(-3px);
+      background: #e0e7ff;
+    }
+    .offline-blog img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .offline-blog h3 {
+      font-size: 1.2rem;
+      color: #1f2937;
+    }
+
+    /* मुख्य कंटेंट */
+    .main-content {
+      margin-left: 80px;
+      padding: 90px 20px 80px;
+      min-height: 100vh;
+      transition: margin-left 0.3s ease;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #1f2937;
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+    .blog-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      padding-bottom: 30px;
+    }
+    .blog-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      animation: fadeIn 0.5s ease-in;
+      position: relative;
+    }
+    .blog-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+    .blog-image {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      display: block;
+      border-bottom: 3px solid #4f46e5;
+      transition: transform 0.3s;
+    }
+    .blog-card:hover .blog-image {
+      transform: scale(1.05);
+    }
+    .blog-content {
+      padding: 20px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .blog-title {
+      font-size: 1.6rem;
+      color: #1f2937;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    .blog-description {
+      font-size: 1rem;
+      color: #6b7280;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-grow: 1;
+    }
+
+    /* तीन बिंदु मेनू */
+    .menu-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #f9fafb;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 11;
+      transition: background 0.3s;
+    }
+    .menu-btn:hover {
+      background: #e0e7ff;
+    }
+    .menu {
+      display: none;
+      position: absolute;
+      top: 45px;
+      right: 10px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 10;
+      min-width: 120px;
+    }
+    .menu.active {
+      display: block;
+    }
+    .menu button {
+      display: block;
+      width: 100%;
+      padding: 10px 15px;
+      background: none;
+      border: none;
+      text-align: left;
+      font-size: 0.9rem;
+      color: #1f2937;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .menu button:hover {
+      background: #f3f3f3;
+    }
+    .menu button:disabled {
+      color: #6b7280;
+      cursor: not-allowed;
+    }
+
+    /* लोड मोर बटन और स्पिनर */
+    .load-more {
+      text-align: center;
+      margin: 30px 0;
+    }
+    .load-more-btn {
+      background: #4f46e5;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .load-more-btn:hover {
+      background: #7c3aed;
+      transform: scale(1.05);
+    }
+    .load-more-btn:disabled {
+      background: #6b7280;
+      cursor: not-allowed;
+    }
+    .spinner {
+      display: none;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4f46e5;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    .spinner.active {
+      display: block;
+    }
+
+    /* फुटर */
+    footer {
+      background: linear-gradient(90deg, #4f46e5, #7c3aed);
+      color: white;
+      text-align: center;
+      padding: 15px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      left: 0;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+      font-size: 0.9rem;
+    }
+
+    /* एनिमेशन */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* रेस्पॉन्सिव डिज़ाइन */
+    @media (max-width: 768px) {
+      .hamburger {
+        display: block;
+      }
+      .sidebar {
+        width: 250px;
+        transform: translateX(-100%);
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      .sidebar:hover {
+        width: 250px;
+      }
+      .sidebar .text {
+        opacity: 1;
+      }
+      .main-content {
+        margin-left: 0;
+        padding-top: 70px;
+        padding-bottom: 80px;
+      }
+      .offline-section {
+        left: 0;
+        width: 100%;
+        border-radius: 0;
+      }
+      header {
+        padding: 10px 15px;
+      }
+      .logo {
+        font-size: 1.4rem;
+      }
+      .blog-list {
+        grid-template-columns: 1fr;
+      }
+      .blog-card {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- हेडर -->
+  <header>
+    <div class="logo">मेरा ब्लॉग</div>
+    <div class="hamburger" id="hamburger">&#9776;</div>
+  </header>
+
+  <!-- साइडबार -->
+  <nav class="sidebar" id="sidebar">
+    <ul>
+      <li><a href="index.html"><span class="icon">🏠</span><span class="text">होम</span></a></li>
+      <li><a href="#"><span class="icon">ℹ️</span><span class="text">अबाउट</span></a></li>
+      <li><a href="#"><span class="icon">📞</span><span class="text">कॉन्टैक्ट</span></a></li>
+      <li><a href="#" id="offlineToggle"><span class="icon">⬇️</span><span class="text">डाउनलोड</span></a></li>
+    </ul>
+  </nav>
+
+  <!-- डाउनलोड सेक्शन -->
+  <div class="offline-section" id="offlineSection">
+    <h2>ऑफलाइन ब्लॉग्स</h2>
+    <div class="offline-list" id="offlineList"></div>
+  </div>
+
+  <!-- मुख्य कंटेंट -->
+  <main class="main-content">
+    <div class="container">
+      <h1>मेरे ब्लॉग</h1>
+      <div class="blog-list" id="blogList"></div>
+      <div class="load-more">
+        <div class="spinner" id="spinner"></div>
+        <button class="load-more-btn" id="loadMoreBtn">लोड मोर</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- फुटर -->
+  <footer>
+    &copy; 2025 मेरा ब्लॉग। सभी अधिकार सुरक्षित।
+  </footer>
+
+  <script>
+    // Service Worker रजिस्टर करना
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => console.log('Service Worker registered'))
+          .catch(error => console.error('Service Worker registration failed:', error));
+      });
+    }
+
+    // IndexedDB सेटअप
+    const dbName = 'BlogDB';
+    const storeName = 'blogs';
+    let db;
+
+    const request = indexedDB.open(dbName, 1);
+    request.onupgradeneeded = event => {
+      db = event.target.result;
+      db.createObjectStore(storeName, { keyPath: 'id' });
+    };
+    request.onsuccess = event => {
+      db = event.target.result;
+      loadOfflineBlogs();
+    };
+    request.onerror = event => console.error('IndexedDB error:', event);
+
+    // हैमबर्गर मेनू और ऑफलाइन सेक्शन टॉगल
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    const offlineToggle = document.getElementById('offlineToggle');
+    const offlineSection = document.getElementById('offlineSection');
+    
+    hamburger.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      offlineSection.classList.remove('active');
+    });
+    
+    offlineToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      offlineSection.classList.toggle('active');
+      sidebar.classList.remove('active');
+    });
+
+    // ब्लॉग लोडिंग लॉजिक
+    const blogList = document.getElementById('blogList');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const spinner = document.getElementById('spinner');
+    const offlineList = document.getElementById('offlineList');
+    let allBlogs = [];
+    let displayedBlogs = [];
+
+    // रैंडम ब्लॉग्स चुनने की फंक्शन
+    function getRandomBlogs(array, count) {
+      const shuffled = [...array].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
+
+    // ब्लॉग कार्ड रेंडर करने की फंक्शन
+    function renderBlogs(blogs, container) {
+      blogs.forEach(blog => {
+        const blogCard = document.createElement('div');
+        blogCard.className = container === blogList ? 'blog-card' : 'offline-blog';
+        blogCard.innerHTML = `
+          ${container === blogList ? `
+            <a href="blog.html?id=${blog.id}">
+              <img src="${blog.image}" alt="${blog.title}" class="blog-image">
+            </a>
+            <div class="blog-content">
+              <h2 class="blog-title">${blog.title}</h2>
+              <p class="blog-description">${blog.description}</p>
+              <button class="menu-btn" onclick="toggleMenu(${blog.id})">⋮</button>
+              <div class="menu" id="menu-${blog.id}">
+                <button onclick="downloadBlog(${blog.id})" id="download-${blog.id}">डाउनलोड करें</button>
+                <button onclick="shareBlog(${blog.id})">शेयर करें</button>
+              </div>
+            </div>
+          ` : `
+            <img src="${blog.image}" alt="${blog.title}">
+            <h3>${blog.title}</h3>
+          `}
+        `;
+        if (container === offlineList) {
+          blogCard.addEventListener('click', () => viewOfflineBlog(blog.id));
+        }
+        container.appendChild(blogCard);
+      });
+    }
+
+    // मेनू टॉगल
+    function toggleMenu(blogId) {
+      const menu = document.getElementById(`menu-${blogId}`);
+      const isActive = menu.classList.contains('active');
+      document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
+      if (!isActive) {
+        menu.classList.add('active');
+      }
+    }
+
+    // ब्लॉग डाउनलोड करने की फंक्शन
+    function downloadBlog(blogId) {
+      const blog = allBlogs.find(b => b.id == blogId);
+      if (!blog) return;
+
+      const transaction = db.transaction([storeName], 'readwrite');
+      const store = transaction.objectStore(storeName);
+      store.put(blog);
+
+      // इमेज कैश करने के लिए फेच करें
+      fetch(blog.image).then(response => response.blob()).then(blob => {
+        caches.open('blog-cache-v1').then(cache => {
+          cache.put(blog.image, new Response(blob));
+        });
+      });
+
+      // बटन डिसेबल करें
+      const button = document.getElementById(`download-${blogId}`);
+      if (button) {
+        button.disabled = true;
+        button.textContent = 'डाउनलोडेड';
+      }
+
+      loadOfflineBlogs();
+    }
+
+    // ब्लॉग शेयर करने की फंक्शन
+    function shareBlog(blogId) {
+      const blog = allBlogs.find(b => b.id == blogId);
+      if (!blog) return;
+
+      if (navigator.share) {
+        navigator.share({
+          title: blog.title,
+          text: blog.description,
+          url: `blog.html?id=${blog.id}`
+        }).catch(error => console.error('Share failed:', error));
+      } else {
+        alert('शेयरिंग उपलब्ध नहीं है। लिंक कॉपी करें: ' + window.location.origin + `/blog.html?id=${blog.id}`);
+      }
+    }
+
+    // ऑफलाइन ब्लॉग्स लोड करने की फंक्शन
+    function loadOfflineBlogs() {
+      const transaction = db.transaction([storeName], 'readonly');
+      const store = transaction.objectStore(storeName);
+      const request = store.getAll();
+      request.onsuccess = () => {
+        offlineList.innerHTML = '';
+        renderBlogs(request.result, offlineList);
+        // डाउनलोड बटन्स अपडेट करें
+        request.result.forEach(blog => {
+          const button = document.getElementById(`download-${blog.id}`);
+          if (button) {
+            button.disabled = true;
+            button.textContent = 'डाउनलोडेड';
+          }
+        });
+      };
+    }
+
+    // ऑफलाइन ब्लॉग देखने की फंक्शन
+    function viewOfflineBlog(blogId) {
+      const transaction = db.transaction([storeName], 'readonly');
+      const store = transaction.objectStore(storeName);
+      const request = store.get(blogId);
+      request.onsuccess = () => {
+        const blog = request.result;
+        if (blog) {
+          const offlineWindow = window.open();
+          offlineWindow.document.write(`
+            <!DOCTYPE html>
+            <html lang="hi">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>${blog.title}</title>
+              <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; background: #e0e7ff; color: #1f2937; }
+                .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); }
+                img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; margin-bottom: 20px; }
+                h1 { font-size: 2rem; margin-bottom: 20px; }
+                p { font-size: 1.1rem; line-height: 1.6; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <h1>${blog.title}</h1>
+                <img src="${blog.image}" alt="${blog.title}">
+                <p>${blog.content}</p>
+              </div>
+            </body>
+            </html>
+          `);
+        }
+      };
+    }
+
+    // JSON डेटा फेच करना
+    fetch('data.json')
+      .then(response => response.json())
+      .then(data => {
+        allBlogs = data;
+        displayedBlogs = getRandomBlogs(allBlogs, 10);
+        renderBlogs(displayedBlogs, blogList);
+
+        if (allBlogs.length > 10) {
+          loadMoreBtn.style.display = 'block';
+        } else {
+          loadMoreBtn.style.display = 'none';
+        }
+
+        loadOfflineBlogs();
+      })
+      .catch(error => console.error('Error fetching data:', error));
+
+    // लोड मोर बटन पर क्लिक
+    loadMoreBtn.addEventListener('click', () => {
+      loadMoreBtn.disabled = true;
+      spinner.classList.add('active');
+
+      setTimeout(() => {
+        const remainingBlogs = allBlogs.filter(blog => !displayedBlogs.includes(blog));
+        const newBlogs = getRandomBlogs(remainingBlogs, Math.min(5, remainingBlogs.length));
+        displayedBlogs = [...displayedBlogs, ...newBlogs];
+        renderBlogs(newBlogs, blogList);
+
+        if (displayedBlogs.length >= allBlogs.length) {
+          loadMoreBtn.style.display = 'none';
+        }
+
+        loadMoreBtn.disabled = false;
+        spinner.classList.remove('active');
+        loadOfflineBlogs();
+      }, 1000);
+    });
+
+    // मेनू बाहर क्लिक करने पर बंद करें
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.menu-btn') && !e.target.closest('.menu')) {
+        document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
+      }
+    });
+  </script>
+</body>
+</html>
