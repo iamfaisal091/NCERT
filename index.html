@@ -121,7 +121,7 @@
       font-size: 2.5rem;
       font-weight: 700;
     }
-    .blog-list {
+    .blog-list, .offline-list {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 25px;
@@ -174,6 +174,37 @@
       overflow: hidden;
       text-overflow: ellipsis;
       flex-grow: 1;
+    }
+    .download-btn {
+      background: #10b981;
+      color: white;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s;
+    }
+    .download-btn:hover {
+      background: #059669;
+    }
+    .download-btn:disabled {
+      background: #6b7280;
+      cursor: not-allowed;
+    }
+
+    /* डाउनलोड सेक्शन */
+    .offline-section {
+      margin-top: 40px;
+      padding: 20px;
+      background: #f9fafb;
+      border-radius: 12px;
+    }
+    .offline-section h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: #1f2937;
     }
 
     /* लोड मोर बटन और स्पिनर */
@@ -266,7 +297,7 @@
       .logo {
         font-size: 1.4rem;
       }
-      .blog-list {
+      .blog-list, .offline-list {
         grid-template-columns: 1fr;
       }
       .blog-card {
@@ -301,6 +332,11 @@
         <div class="spinner" id="spinner"></div>
         <button class="load-more-btn" id="loadMoreBtn">लोड मोर</button>
       </div>
+      <!-- डाउनलोड सेक्शन -->
+      <div class="offline-section">
+        <h2>ऑफलाइन ब्लॉग्स</h2>
+        <div class="offline-list" id="offlineList"></div>
+      </div>
     </div>
   </main>
 
@@ -310,6 +346,31 @@
   </footer>
 
   <script>
+    // Service Worker रजिस्टर करना
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => console.log('Service Worker registered'))
+          .catch(error => console.error('Service Worker registration failed:', error));
+      });
+    }
+
+    // IndexedDB सेटअप
+    const dbName = 'BlogDB';
+    const storeName = 'blogs';
+    let db;
+
+    const request = indexedDB.open(dbName, 1);
+    request.onupgradeneeded = event => {
+      db = event.target.result;
+      db.createObjectStore(storeName, { keyPath: 'id' });
+    };
+    request.onsuccess = event => {
+      db = event.target.result;
+      loadOfflineBlogs();
+    };
+    request.onerror = event => console.error('IndexedDB error:', event);
+
     // हैमबर्गर मेनू टॉगल
     const hamburger = document.getElementById('hamburger');
     const sidebar = document.getElementById('sidebar');
@@ -321,6 +382,7 @@
     const blogList = document.getElementById('blogList');
     const loadMoreBtn = document.getElementById('loadMoreBtn');
     const spinner = document.getElementById('spinner');
+    const offlineList = document.getElementById('offlineList');
     let allBlogs = [];
     let displayedBlogs = [];
 
@@ -331,21 +393,94 @@
     }
 
     // ब्लॉग कार्ड रेंडर करने की फंक्शन
-    function renderBlogs(blogs) {
+    function renderBlogs(blogs, container) {
       blogs.forEach(blog => {
         const blogCard = document.createElement('div');
         blogCard.className = 'blog-card';
         blogCard.innerHTML = `
-          <a href="blog.html?id=${blog.id}">
+          <a href="${container === blogList ? `blog.html?id=${blog.id}` : `javascript:viewOfflineBlog(${blog.id})`}">
             <img src="${blog.image}" alt="${blog.title}" class="blog-image">
           </a>
           <div class="blog-content">
             <h2 class="blog-title">${blog.title}</h2>
             <p class="blog-description">${blog.description}</p>
+            ${container === blogList ? `<button class="download-btn" onclick="downloadBlog(${blog.id})">डाउनलोड करें</button>` : ''}
           </div>
         `;
-        blogList.appendChild(blogCard);
+        container.appendChild(blogCard);
       });
+    }
+
+    // ब्लॉग डाउनलोड करने की फंक्शन
+    function downloadBlog(blogId) {
+      const blog = allBlogs.find(b => b.id == blogId);
+      if (!blog) return;
+
+      const transaction = db.transaction([storeName], 'readwrite');
+      const store = transaction.objectStore(storeName);
+      store.put(blog);
+
+      // इमेज कैश करने के लिए फेच करें
+      fetch(blog.image).then(response => response.blob()).then(blob => {
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(blog.image, new Response(blob));
+        });
+      });
+
+      // बटन डिसेबल करें
+      const button = document.querySelector(`button[onclick="downloadBlog(${blogId})"]`);
+      button.disabled = true;
+      button.textContent = 'डाउनलोडेड';
+
+      loadOfflineBlogs();
+    }
+
+    // ऑफलाइन ब्लॉग्स लोड करने की फंक्शन
+    function loadOfflineBlogs() {
+      const transaction = db.transaction([storeName], 'readonly');
+      const store = transaction.objectStore(storeName);
+      const request = store.getAll();
+      request.onsuccess = () => {
+        offlineList.innerHTML = '';
+        renderBlogs(request.result, offlineList);
+      };
+    }
+
+    // ऑफलाइन ब्लॉग देखने की फंक्शन
+    function viewOfflineBlog(blogId) {
+      const transaction = db.transaction([storeName], 'readonly');
+      const store = transaction.objectStore(storeName);
+      const request = store.get(blogId);
+      request.onsuccess = () => {
+        const blog = request.result;
+        if (blog) {
+          const offlineWindow = window.open();
+          offlineWindow.document.write(`
+            <!DOCTYPE html>
+            <html lang="hi">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>${blog.title}</title>
+              <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; background: #e0e7ff; color: #1f2937; }
+                .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); }
+                img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; margin-bottom: 20px; }
+                h1 { font-size: 2rem; margin-bottom: 20px; }
+                p { font-size: 1.1rem; line-height: 1.6; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <h1>${blog.title}</h1>
+                <img src="${blog.image}" alt="${blog.title}">
+                <p>${blog.content}</p>
+              </div>
+            </body>
+            </html>
+          `);
+        }
+      };
     }
 
     // JSON डेटा फेच करना
@@ -353,11 +488,9 @@
       .then(response => response.json())
       .then(data => {
         allBlogs = data;
-        // शुरुआती 10 रैंडम ब्लॉग्स
         displayedBlogs = getRandomBlogs(allBlogs, 10);
-        renderBlogs(displayedBlogs);
+        renderBlogs(displayedBlogs, blogList);
 
-        // अगर 10 से ज्यादा ब्लॉग्स हैं, तो लोड मोर बटन दिखाएँ
         if (allBlogs.length > 10) {
           loadMoreBtn.style.display = 'block';
         } else {
@@ -372,20 +505,18 @@
       spinner.classList.add('active');
 
       setTimeout(() => {
-        // बचे हुए ब्लॉग्स में से 5 रैंडम ब्लॉग्स
         const remainingBlogs = allBlogs.filter(blog => !displayedBlogs.includes(blog));
         const newBlogs = getRandomBlogs(remainingBlogs, Math.min(5, remainingBlogs.length));
         displayedBlogs = [...displayedBlogs, ...newBlogs];
-        renderBlogs(newBlogs);
+        renderBlogs(newBlogs, blogList);
 
-        // अगर कोई और ब्लॉग नहीं बचा, तो बटन छिपाएँ
         if (displayedBlogs.length >= allBlogs.length) {
           loadMoreBtn.style.display = 'none';
         }
 
         loadMoreBtn.disabled = false;
         spinner.classList.remove('active');
-      }, 1000); // 1 सेकंड का डिले लोडिंग सिमुलेशन के लिए
+      }, 1000);
     });
   </script>
 </body>
