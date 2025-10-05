@@ -103,6 +103,57 @@
       opacity: 1;
     }
 
+    /* डाउनलोड सेक्शन */
+    .offline-section {
+      position: fixed;
+      top: 80px;
+      left: 80px;
+      width: 300px;
+      height: calc(100vh - 80px);
+      background: #f9fafb;
+      padding: 20px;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 998;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
+    }
+    .offline-section.active {
+      transform: translateX(0);
+    }
+    .offline-section h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: #1f2937;
+    }
+    .offline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .offline-blog {
+      background: white;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .offline-blog:hover {
+      transform: translateY(-3px);
+    }
+    .offline-blog img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .offline-blog h3 {
+      font-size: 1.2rem;
+      color: #1f2937;
+    }
+
     /* मुख्य कंटेंट */
     .main-content {
       margin-left: 80px;
@@ -121,7 +172,7 @@
       font-size: 2.5rem;
       font-weight: 700;
     }
-    .blog-list, .offline-list {
+    .blog-list {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 25px;
@@ -137,6 +188,7 @@
       flex-direction: column;
       height: 100%;
       animation: fadeIn 0.5s ease-in;
+      position: relative;
     }
     .blog-card:hover {
       transform: translateY(-8px);
@@ -175,36 +227,53 @@
       text-overflow: ellipsis;
       flex-grow: 1;
     }
-    .download-btn {
-      background: #10b981;
-      color: white;
-      padding: 8px;
+
+    /* तीन बिंदु मेनू */
+    .menu-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
       border: none;
-      border-radius: 6px;
-      font-size: 0.9rem;
+      font-size: 1.2rem;
       cursor: pointer;
-      margin-top: 10px;
+      color: #6b7280;
+      padding: 5px;
+    }
+    .menu-btn:hover {
+      color: #1f2937;
+    }
+    .menu {
+      display: none;
+      position: absolute;
+      top: 35px;
+      right: 10px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      z-index: 10;
+    }
+    .menu.active {
+      display: block;
+    }
+    .menu button {
+      display: block;
+      width: 100%;
+      padding: 10px 15px;
+      background: none;
+      border: none;
+      text-align: left;
+      font-size: 0.9rem;
+      color: #1f2937;
+      cursor: pointer;
       transition: background 0.3s;
     }
-    .download-btn:hover {
-      background: #059669;
+    .menu button:hover {
+      background: #f3f3f3;
     }
-    .download-btn:disabled {
-      background: #6b7280;
+    .menu button:disabled {
+      color: #6b7280;
       cursor: not-allowed;
-    }
-
-    /* डाउनलोड सेक्शन */
-    .offline-section {
-      margin-top: 40px;
-      padding: 20px;
-      background: #f9fafb;
-      border-radius: 12px;
-    }
-    .offline-section h2 {
-      font-size: 1.8rem;
-      margin-bottom: 20px;
-      color: #1f2937;
     }
 
     /* लोड मोर बटन और स्पिनर */
@@ -291,13 +360,17 @@
         padding-top: 70px;
         padding-bottom: 80px;
       }
+      .offline-section {
+        left: 0;
+        width: 100%;
+      }
       header {
         padding: 10px 15px;
       }
       .logo {
         font-size: 1.4rem;
       }
-      .blog-list, .offline-list {
+      .blog-list {
         grid-template-columns: 1fr;
       }
       .blog-card {
@@ -319,9 +392,15 @@
       <li><a href="index.html"><span class="icon">🏠</span><span class="text">होम</span></a></li>
       <li><a href="#"><span class="icon">ℹ️</span><span class="text">अबाउट</span></a></li>
       <li><a href="#"><span class="icon">📞</span><span class="text">कॉन्टैक्ट</span></a></li>
-      <li><a href="#"><span class="icon">📝</span><span class="text">ब्लॉग्स</span></a></li>
+      <li><a href="#" id="offlineToggle"><span class="icon">⬇️</span><span class="text">डाउनलोड</span></a></li>
     </ul>
   </nav>
+
+  <!-- डाउनलोड सेक्शन -->
+  <div class="offline-section" id="offlineSection">
+    <h2>ऑफलाइन ब्लॉग्स</h2>
+    <div class="offline-list" id="offlineList"></div>
+  </div>
 
   <!-- मुख्य कंटेंट -->
   <main class="main-content">
@@ -331,11 +410,6 @@
       <div class="load-more">
         <div class="spinner" id="spinner"></div>
         <button class="load-more-btn" id="loadMoreBtn">लोड मोर</button>
-      </div>
-      <!-- डाउनलोड सेक्शन -->
-      <div class="offline-section">
-        <h2>ऑफलाइन ब्लॉग्स</h2>
-        <div class="offline-list" id="offlineList"></div>
       </div>
     </div>
   </main>
@@ -371,11 +445,21 @@
     };
     request.onerror = event => console.error('IndexedDB error:', event);
 
-    // हैमबर्गर मेनू टॉगल
+    // हैमबर्गर मेनू और ऑफलाइन सेक्शन टॉगल
     const hamburger = document.getElementById('hamburger');
     const sidebar = document.getElementById('sidebar');
+    const offlineToggle = document.getElementById('offlineToggle');
+    const offlineSection = document.getElementById('offlineSection');
+    
     hamburger.addEventListener('click', () => {
       sidebar.classList.toggle('active');
+      offlineSection.classList.remove('active'); // साइडबार टॉगल होने पर ऑफलाइन सेक्शन बंद
+    });
+    
+    offlineToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      offlineSection.classList.toggle('active');
+      sidebar.classList.remove('active'); // ऑफलाइन सेक्शन टॉगल होने पर साइडबार बंद
     });
 
     // ब्लॉग लोडिंग लॉजिक
@@ -396,19 +480,42 @@
     function renderBlogs(blogs, container) {
       blogs.forEach(blog => {
         const blogCard = document.createElement('div');
-        blogCard.className = 'blog-card';
+        blogCard.className = container === blogList ? 'blog-card' : 'offline-blog';
         blogCard.innerHTML = `
-          <a href="${container === blogList ? `blog.html?id=${blog.id}` : `javascript:viewOfflineBlog(${blog.id})`}">
-            <img src="${blog.image}" alt="${blog.title}" class="blog-image">
-          </a>
-          <div class="blog-content">
-            <h2 class="blog-title">${blog.title}</h2>
-            <p class="blog-description">${blog.description}</p>
-            ${container === blogList ? `<button class="download-btn" onclick="downloadBlog(${blog.id})">डाउनलोड करें</button>` : ''}
-          </div>
+          ${container === blogList ? `
+            <a href="blog.html?id=${blog.id}">
+              <img src="${blog.image}" alt="${blog.title}" class="blog-image">
+            </a>
+            <div class="blog-content">
+              <h2 class="blog-title">${blog.title}</h2>
+              <p class="blog-description">${blog.description}</p>
+              <button class="menu-btn" onclick="toggleMenu(${blog.id})">⋮</button>
+              <div class="menu" id="menu-${blog.id}">
+                <button onclick="downloadBlog(${blog.id})" id="download-${blog.id}">डाउनलोड करें</button>
+                <button onclick="shareBlog(${blog.id})">शेयर करें</button>
+              </div>
+            </div>
+          ` : `
+            <img src="${blog.image}" alt="${blog.title}">
+            <h3>${blog.title}</h3>
+          `}
         `;
+        if (container === offlineList) {
+          blogCard.addEventListener('click', () => viewOfflineBlog(blog.id));
+        }
         container.appendChild(blogCard);
       });
+    }
+
+    // मेनू टॉगल
+    function toggleMenu(blogId) {
+      const menu = document.getElementById(`menu-${blogId}`);
+      const isActive = menu.classList.contains('active');
+      // सभी मेनू बंद करें
+      document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
+      if (!isActive) {
+        menu.classList.add('active');
+      }
     }
 
     // ब्लॉग डाउनलोड करने की फंक्शन
@@ -422,17 +529,33 @@
 
       // इमेज कैश करने के लिए फेच करें
       fetch(blog.image).then(response => response.blob()).then(blob => {
-        caches.open(CACHE_NAME).then(cache => {
+        caches.open('blog-cache-v1').then(cache => {
           cache.put(blog.image, new Response(blob));
         });
       });
 
       // बटन डिसेबल करें
-      const button = document.querySelector(`button[onclick="downloadBlog(${blogId})"]`);
+      const button = document.getElementById(`download-${blogId}`);
       button.disabled = true;
       button.textContent = 'डाउनलोडेड';
 
       loadOfflineBlogs();
+    }
+
+    // ब्लॉग शेयर करने की फंक्शन
+    function shareBlog(blogId) {
+      const blog = allBlogs.find(b => b.id == blogId);
+      if (!blog) return;
+
+      if (navigator.share) {
+        navigator.share({
+          title: blog.title,
+          text: blog.description,
+          url: `blog.html?id=${blog.id}`
+        }).catch(error => console.error('Share failed:', error));
+      } else {
+        alert('शेयरिंग उपलब्ध नहीं है। लिंक कॉपी करें: ' + window.location.origin + `/blog.html?id=${blog.id}`);
+      }
     }
 
     // ऑफलाइन ब्लॉग्स लोड करने की फंक्शन
@@ -443,6 +566,14 @@
       request.onsuccess = () => {
         offlineList.innerHTML = '';
         renderBlogs(request.result, offlineList);
+        // डाउनलोड बटन्स अपडेट करें
+        request.result.forEach(blog => {
+          const button = document.getElementById(`download-${blog.id}`);
+          if (button) {
+            button.disabled = true;
+            button.textContent = 'डाउनलोडेड';
+          }
+        });
       };
     }
 
@@ -496,6 +627,9 @@
         } else {
           loadMoreBtn.style.display = 'none';
         }
+
+        // पहले से डाउनलोडेड ब्लॉग्स के लिए बटन्स अपडेट करें
+        loadOfflineBlogs();
       })
       .catch(error => console.error('Error fetching data:', error));
 
@@ -516,8 +650,16 @@
 
         loadMoreBtn.disabled = false;
         spinner.classList.remove('active');
+        loadOfflineBlogs(); // नए ब्लॉग्स के लिए डाउनलोड स्टेटस अपडेट
       }, 1000);
+    });
+
+    // मेनू बाहर क्लिक करने पर बंद करें
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.menu-btn') && !e.target.closest('.menu')) {
+        document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
+      }
     });
   </script>
 </body>
-  </html>
+    </html>
