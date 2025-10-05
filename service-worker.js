@@ -2,6 +2,7 @@ const CACHE_NAME = 'blog-cache-v1';
 const urlsToCache = [
   '/',
   '/index.html',
+  '/blog.html',
   '/data.json'
 ];
 
