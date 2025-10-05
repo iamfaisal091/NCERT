@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ब्लॉग वेबसाइट</title>
+  <title>मेरा ब्लॉग</title>
+  <!-- jsPDF CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     /* रिसेट और बेसिक स्टाइल */
     * {
@@ -101,61 +103,6 @@
     }
     .sidebar:hover .text {
       opacity: 1;
-    }
-
-    /* डाउनलोड सेक्शन */
-    .offline-section {
-      position: fixed;
-      top: 80px;
-      left: 80px;
-      width: 320px;
-      height: calc(100vh - 80px);
-      background: #ffffff;
-      padding: 20px;
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-      z-index: 998;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-      overflow-y: auto;
-      border-radius: 0 8px 8px 0;
-    }
-    .offline-section.active {
-      transform: translateX(0);
-    }
-    .offline-section h2 {
-      font-size: 1.8rem;
-      margin-bottom: 20px;
-      color: #1f2937;
-      border-bottom: 2px solid #4f46e5;
-      padding-bottom: 10px;
-    }
-    .offline-list {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    .offline-blog {
-      background: #f9fafb;
-      border-radius: 8px;
-      padding: 10px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      transition: transform 0.3s, background 0.3s;
-    }
-    .offline-blog:hover {
-      transform: translateY(-3px);
-      background: #e0e7ff;
-    }
-    .offline-blog img {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
-      border-radius: 6px;
-      margin-bottom: 10px;
-    }
-    .offline-blog h3 {
-      font-size: 1.2rem;
-      color: #1f2937;
     }
 
     /* मुख्य कंटेंट */
@@ -284,10 +231,6 @@
     .menu button:hover {
       background: #f3f3f3;
     }
-    .menu button:disabled {
-      color: #6b7280;
-      cursor: not-allowed;
-    }
 
     /* लोड मोर बटन और स्पिनर */
     .load-more {
@@ -373,11 +316,6 @@
         padding-top: 70px;
         padding-bottom: 80px;
       }
-      .offline-section {
-        left: 0;
-        width: 100%;
-        border-radius: 0;
-      }
       header {
         padding: 10px 15px;
       }
@@ -406,15 +344,8 @@
       <li><a href="index.html"><span class="icon">🏠</span><span class="text">होम</span></a></li>
       <li><a href="#"><span class="icon">ℹ️</span><span class="text">अबाउट</span></a></li>
       <li><a href="#"><span class="icon">📞</span><span class="text">कॉन्टैक्ट</span></a></li>
-      <li><a href="#" id="offlineToggle"><span class="icon">⬇️</span><span class="text">डाउनलोड</span></a></li>
     </ul>
   </nav>
-
-  <!-- डाउनलोड सेक्शन -->
-  <div class="offline-section" id="offlineSection">
-    <h2>ऑफलाइन ब्लॉग्स</h2>
-    <div class="offline-list" id="offlineList"></div>
-  </div>
 
   <!-- मुख्य कंटेंट -->
   <main class="main-content">
@@ -434,53 +365,17 @@
   </footer>
 
   <script>
-    // Service Worker रजिस्टर करना
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(registration => console.log('Service Worker registered'))
-          .catch(error => console.error('Service Worker registration failed:', error));
-      });
-    }
-
-    // IndexedDB सेटअप
-    const dbName = 'BlogDB';
-    const storeName = 'blogs';
-    let db;
-
-    const request = indexedDB.open(dbName, 1);
-    request.onupgradeneeded = event => {
-      db = event.target.result;
-      db.createObjectStore(storeName, { keyPath: 'id' });
-    };
-    request.onsuccess = event => {
-      db = event.target.result;
-      loadOfflineBlogs();
-    };
-    request.onerror = event => console.error('IndexedDB error:', event);
-
-    // हैमबर्गर मेनू और ऑफलाइन सेक्शन टॉगल
+    // हैमबर्गर मेनू टॉगल
     const hamburger = document.getElementById('hamburger');
     const sidebar = document.getElementById('sidebar');
-    const offlineToggle = document.getElementById('offlineToggle');
-    const offlineSection = document.getElementById('offlineSection');
-    
     hamburger.addEventListener('click', () => {
       sidebar.classList.toggle('active');
-      offlineSection.classList.remove('active');
-    });
-    
-    offlineToggle.addEventListener('click', (e) => {
-      e.preventDefault();
-      offlineSection.classList.toggle('active');
-      sidebar.classList.remove('active');
     });
 
     // ब्लॉग लोडिंग लॉजिक
     const blogList = document.getElementById('blogList');
     const loadMoreBtn = document.getElementById('loadMoreBtn');
     const spinner = document.getElementById('spinner');
-    const offlineList = document.getElementById('offlineList');
     let allBlogs = [];
     let displayedBlogs = [];
 
@@ -491,33 +386,25 @@
     }
 
     // ब्लॉग कार्ड रेंडर करने की फंक्शन
-    function renderBlogs(blogs, container) {
+    function renderBlogs(blogs) {
       blogs.forEach(blog => {
         const blogCard = document.createElement('div');
-        blogCard.className = container === blogList ? 'blog-card' : 'offline-blog';
+        blogCard.className = 'blog-card';
         blogCard.innerHTML = `
-          ${container === blogList ? `
-            <a href="blog.html?id=${blog.id}">
-              <img src="${blog.image}" alt="${blog.title}" class="blog-image">
-            </a>
-            <div class="blog-content">
-              <h2 class="blog-title">${blog.title}</h2>
-              <p class="blog-description">${blog.description}</p>
-              <button class="menu-btn" onclick="toggleMenu(${blog.id})">⋮</button>
-              <div class="menu" id="menu-${blog.id}">
-                <button onclick="downloadBlog(${blog.id})" id="download-${blog.id}">डाउनलोड करें</button>
-                <button onclick="shareBlog(${blog.id})">शेयर करें</button>
-              </div>
+          <a href="blog.html?id=${blog.id}">
+            <img src="${blog.image}" alt="${blog.title}" class="blog-image">
+          </a>
+          <div class="blog-content">
+            <h2 class="blog-title">${blog.title}</h2>
+            <p class="blog-description">${blog.description}</p>
+            <button class="menu-btn" onclick="toggleMenu(${blog.id})">⋮</button>
+            <div class="menu" id="menu-${blog.id}">
+              <button onclick="downloadBlogAsPDF(${blog.id})">डाउनलोड करें</button>
+              <button onclick="shareBlog(${blog.id})">शेयर करें</button>
             </div>
-          ` : `
-            <img src="${blog.image}" alt="${blog.title}">
-            <h3>${blog.title}</h3>
-          `}
+          </div>
         `;
-        if (container === offlineList) {
-          blogCard.addEventListener('click', () => viewOfflineBlog(blog.id));
-        }
-        container.appendChild(blogCard);
+        blogList.appendChild(blogCard);
       });
     }
 
@@ -531,30 +418,22 @@
       }
     }
 
-    // ब्लॉग डाउनलोड करने की फंक्शन
-    function downloadBlog(blogId) {
+    // ब्लॉग को PDF के रूप में डाउनलोड करने की फंक्शन
+    function downloadBlogAsPDF(blogId) {
       const blog = allBlogs.find(b => b.id == blogId);
       if (!blog) return;
 
-      const transaction = db.transaction([storeName], 'readwrite');
-      const store = transaction.objectStore(storeName);
-      store.put(blog);
-
-      // इमेज कैश करने के लिए फेच करें
-      fetch(blog.image).then(response => response.blob()).then(blob => {
-        caches.open('blog-cache-v1').then(cache => {
-          cache.put(blog.image, new Response(blob));
-        });
-      });
-
-      // बटन डिसेबल करें
-      const button = document.getElementById(`download-${blogId}`);
-      if (button) {
-        button.disabled = true;
-        button.textContent = 'डाउनलोडेड';
-      }
-
-      loadOfflineBlogs();
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFont('Helvetica', 'normal');
+      doc.setFontSize(18);
+      doc.text(20, 20, blog.title);
+      doc.setFontSize(12);
+      doc.text(20, 40, blog.description);
+      // कंटेंट को लाइन-बाय-लाइन प्रोसेस करें ताकि पेज ब्रेक हो सके
+      const contentLines = doc.splitTextToSize(blog.content, 170); // 170mm चौड़ाई
+      doc.text(20, 60, contentLines);
+      doc.save(`${blog.title}.pdf`);
     }
 
     // ब्लॉग शेयर करने की फंक्शन
@@ -569,64 +448,11 @@
           url: `blog.html?id=${blog.id}`
         }).catch(error => console.error('Share failed:', error));
       } else {
-        alert('शेयरिंग उपलब्ध नहीं है। लिंक कॉपी करें: ' + window.location.origin + `/blog.html?id=${blog.id}`);
-      }
-    }
-
-    // ऑफलाइन ब्लॉग्स लोड करने की फंक्शन
-    function loadOfflineBlogs() {
-      const transaction = db.transaction([storeName], 'readonly');
-      const store = transaction.objectStore(storeName);
-      const request = store.getAll();
-      request.onsuccess = () => {
-        offlineList.innerHTML = '';
-        renderBlogs(request.result, offlineList);
-        // डाउनलोड बटन्स अपडेट करें
-        request.result.forEach(blog => {
-          const button = document.getElementById(`download-${blog.id}`);
-          if (button) {
-            button.disabled = true;
-            button.textContent = 'डाउनलोडेड';
-          }
+        const url = window.location.origin + `/blog.html?id=${blog.id}`;
+        navigator.clipboard.writeText(url).then(() => {
+          alert('लिंक कॉपी किया गया: ' + url);
         });
-      };
-    }
-
-    // ऑफलाइन ब्लॉग देखने की फंक्शन
-    function viewOfflineBlog(blogId) {
-      const transaction = db.transaction([storeName], 'readonly');
-      const store = transaction.objectStore(storeName);
-      const request = store.get(blogId);
-      request.onsuccess = () => {
-        const blog = request.result;
-        if (blog) {
-          const offlineWindow = window.open();
-          offlineWindow.document.write(`
-            <!DOCTYPE html>
-            <html lang="hi">
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>${blog.title}</title>
-              <style>
-                body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; background: #e0e7ff; color: #1f2937; }
-                .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); }
-                img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; margin-bottom: 20px; }
-                h1 { font-size: 2rem; margin-bottom: 20px; }
-                p { font-size: 1.1rem; line-height: 1.6; }
-              </style>
-            </head>
-            <body>
-              <div class="container">
-                <h1>${blog.title}</h1>
-                <img src="${blog.image}" alt="${blog.title}">
-                <p>${blog.content}</p>
-              </div>
-            </body>
-            </html>
-          `);
-        }
-      };
+      }
     }
 
     // JSON डेटा फेच करना
@@ -635,15 +461,13 @@
       .then(data => {
         allBlogs = data;
         displayedBlogs = getRandomBlogs(allBlogs, 10);
-        renderBlogs(displayedBlogs, blogList);
+        renderBlogs(displayedBlogs);
 
         if (allBlogs.length > 10) {
           loadMoreBtn.style.display = 'block';
         } else {
           loadMoreBtn.style.display = 'none';
         }
-
-        loadOfflineBlogs();
       })
       .catch(error => console.error('Error fetching data:', error));
 
@@ -656,7 +480,7 @@
         const remainingBlogs = allBlogs.filter(blog => !displayedBlogs.includes(blog));
         const newBlogs = getRandomBlogs(remainingBlogs, Math.min(5, remainingBlogs.length));
         displayedBlogs = [...displayedBlogs, ...newBlogs];
-        renderBlogs(newBlogs, blogList);
+        renderBlogs(newBlogs);
 
         if (displayedBlogs.length >= allBlogs.length) {
           loadMoreBtn.style.display = 'none';
@@ -664,7 +488,6 @@
 
         loadMoreBtn.disabled = false;
         spinner.classList.remove('active');
-        loadOfflineBlogs();
       }, 1000);
     });
 
@@ -676,4 +499,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
