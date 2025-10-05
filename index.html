@@ -10,13 +10,13 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Arial, sans-serif;
     }
     body {
-      background-color: #f4f4f4;
-      color: #333;
+      background-color: #e0e7ff;
+      color: #1f2937;
       line-height: 1.6;
-      overflow-x: hidden; /* होरिजॉन्टल स्क्रॉल रोकने के लिए */
+      overflow-x: hidden;
     }
     a {
       text-decoration: none;
@@ -25,7 +25,7 @@
 
     /* हेडर */
     header {
-      background: linear-gradient(90deg, #1a73e8, #4285f4);
+      background: linear-gradient(90deg, #4f46e5, #7c3aed);
       color: white;
       padding: 15px 20px;
       position: fixed;
@@ -36,55 +36,62 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
     .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
     }
     .hamburger {
       display: none;
       font-size: 2rem;
       cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .hamburger:hover {
+      transform: rotate(90deg);
     }
 
     /* साइडबार */
     .sidebar {
-      background: #1a1a1a;
+      background: #111827;
       color: white;
-      width: 70px;
+      width: 80px;
       height: 100vh;
       position: fixed;
       top: 0;
       left: 0;
-      padding-top: 70px;
+      padding-top: 80px;
       transition: width 0.3s ease;
       z-index: 999;
       overflow: hidden;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     }
     .sidebar:hover {
-      width: 200px;
+      width: 220px;
     }
     .sidebar ul {
       list-style: none;
       padding: 20px 0;
     }
     .sidebar li {
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
     .sidebar a {
       display: flex;
       align-items: center;
-      padding: 10px 15px;
-      font-size: 1rem;
+      padding: 12px 15px;
+      font-size: 1.1rem;
       color: white;
-      transition: background 0.3s;
+      transition: background 0.3s, transform 0.2s;
     }
     .sidebar a:hover {
-      background: #4285f4;
+      background: #4f46e5;
+      transform: translateX(5px);
     }
     .sidebar .icon {
-      font-size: 1.2rem;
+      font-size: 1.4rem;
       width: 40px;
       text-align: center;
     }
@@ -98,9 +105,9 @@
 
     /* मुख्य कंटेंट */
     .main-content {
-      margin-left: 70px;
-      padding: 80px 20px 80px; /* फुटर के लिए नीचे पैडिंग */
-      min-height: 100vh; /* पूरे स्क्रीन की हाइट */
+      margin-left: 80px;
+      padding: 90px 20px 80px;
+      min-height: 100vh;
       transition: margin-left 0.3s ease;
     }
     .container {
@@ -109,50 +116,58 @@
     }
     h1 {
       text-align: center;
-      margin-bottom: 20px;
-      color: #333;
+      margin-bottom: 30px;
+      color: #1f2937;
+      font-size: 2.5rem;
+      font-weight: 700;
     }
     .blog-list {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      padding-bottom: 20px;
+      gap: 25px;
+      padding-bottom: 30px;
     }
     .blog-card {
       background: white;
-      border-radius: 12px;
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
       transition: transform 0.3s, box-shadow 0.3s;
       display: flex;
       flex-direction: column;
-      height: 100%; /* कार्ड पूरी हाइट ले */
+      height: 100%;
+      animation: fadeIn 0.5s ease-in;
     }
     .blog-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+      transform: translateY(-8px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
     }
     .blog-image {
       width: 100%;
       aspect-ratio: 16 / 9;
-      object-fit: cover; /* YouTube थंबनेल की तरह फिट */
+      object-fit: cover;
       display: block;
-      border-bottom: 2px solid #1a73e8;
+      border-bottom: 3px solid #4f46e5;
+      transition: transform 0.3s;
+    }
+    .blog-card:hover .blog-image {
+      transform: scale(1.05);
     }
     .blog-content {
-      padding: 15px;
-      flex-grow: 1; /* कंटेंट को बाकी स्पेस लेने दें */
+      padding: 20px;
+      flex-grow: 1;
       display: flex;
       flex-direction: column;
     }
     .blog-title {
-      font-size: 1.5rem;
-      color: #333;
-      margin-bottom: 10px;
+      font-size: 1.6rem;
+      color: #1f2937;
+      margin-bottom: 12px;
+      font-weight: 600;
     }
     .blog-description {
       font-size: 1rem;
-      color: #666;
+      color: #6b7280;
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
@@ -161,9 +176,46 @@
       flex-grow: 1;
     }
 
+    /* लोड मोर बटन और स्पिनर */
+    .load-more {
+      text-align: center;
+      margin: 30px 0;
+    }
+    .load-more-btn {
+      background: #4f46e5;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .load-more-btn:hover {
+      background: #7c3aed;
+      transform: scale(1.05);
+    }
+    .load-more-btn:disabled {
+      background: #6b7280;
+      cursor: not-allowed;
+    }
+    .spinner {
+      display: none;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4f46e5;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    .spinner.active {
+      display: block;
+    }
+
     /* फुटर */
     footer {
-      background: linear-gradient(90deg, #1a73e8, #4285f4);
+      background: linear-gradient(90deg, #4f46e5, #7c3aed);
       color: white;
       text-align: center;
       padding: 15px;
@@ -171,7 +223,18 @@
       bottom: 0;
       width: 100%;
       left: 0;
-      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+      font-size: 0.9rem;
+    }
+
+    /* एनिमेशन */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     /* रेस्पॉन्सिव डिज़ाइन */
@@ -194,20 +257,20 @@
       }
       .main-content {
         margin-left: 0;
-        padding-top: 60px;
-        padding-bottom: 80px; /* फुटर के लिए */
+        padding-top: 70px;
+        padding-bottom: 80px;
       }
       header {
         padding: 10px 15px;
       }
       .logo {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
       }
       .blog-list {
-        grid-template-columns: 1fr; /* मोबाइल पर सिंगल कॉलम */
+        grid-template-columns: 1fr;
       }
       .blog-card {
-        max-width: 100%; /* मोबाइल पर फुल-व्हिड्थ */
+        max-width: 100%;
       }
     }
   </style>
@@ -234,6 +297,10 @@
     <div class="container">
       <h1>मेरे ब्लॉग</h1>
       <div class="blog-list" id="blogList"></div>
+      <div class="load-more">
+        <div class="spinner" id="spinner"></div>
+        <button class="load-more-btn" id="loadMoreBtn">लोड मोर</button>
+      </div>
     </div>
   </main>
 
@@ -250,27 +317,76 @@
       sidebar.classList.toggle('active');
     });
 
+    // ब्लॉग लोडिंग लॉजिक
+    const blogList = document.getElementById('blogList');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const spinner = document.getElementById('spinner');
+    let allBlogs = [];
+    let displayedBlogs = [];
+
+    // रैंडम ब्लॉग्स चुनने की फंक्शन
+    function getRandomBlogs(array, count) {
+      const shuffled = [...array].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
+
+    // ब्लॉग कार्ड रेंडर करने की फंक्शन
+    function renderBlogs(blogs) {
+      blogs.forEach(blog => {
+        const blogCard = document.createElement('div');
+        blogCard.className = 'blog-card';
+        blogCard.innerHTML = `
+          <a href="blog.html?id=${blog.id}">
+            <img src="${blog.image}" alt="${blog.title}" class="blog-image">
+          </a>
+          <div class="blog-content">
+            <h2 class="blog-title">${blog.title}</h2>
+            <p class="blog-description">${blog.description}</p>
+          </div>
+        `;
+        blogList.appendChild(blogCard);
+      });
+    }
+
     // JSON डेटा फेच करना
     fetch('data.json')
       .then(response => response.json())
       .then(data => {
-        const blogList = document.getElementById('blogList');
-        data.forEach(blog => {
-          const blogCard = document.createElement('div');
-          blogCard.className = 'blog-card';
-          blogCard.innerHTML = `
-            <a href="blog.html?id=${blog.id}">
-              <img src="${blog.image}" alt="${blog.title}" class="blog-image">
-            </a>
-            <div class="blog-content">
-              <h2 class="blog-title">${blog.title}</h2>
-              <p class="blog-description">${blog.description}</p>
-            </div>
-          `;
-          blogList.appendChild(blogCard);
-        });
+        allBlogs = data;
+        // शुरुआती 10 रैंडम ब्लॉग्स
+        displayedBlogs = getRandomBlogs(allBlogs, 10);
+        renderBlogs(displayedBlogs);
+
+        // अगर 10 से ज्यादा ब्लॉग्स हैं, तो लोड मोर बटन दिखाएँ
+        if (allBlogs.length > 10) {
+          loadMoreBtn.style.display = 'block';
+        } else {
+          loadMoreBtn.style.display = 'none';
+        }
       })
       .catch(error => console.error('Error fetching data:', error));
+
+    // लोड मोर बटन पर क्लिक
+    loadMoreBtn.addEventListener('click', () => {
+      loadMoreBtn.disabled = true;
+      spinner.classList.add('active');
+
+      setTimeout(() => {
+        // बचे हुए ब्लॉग्स में से 5 रैंडम ब्लॉग्स
+        const remainingBlogs = allBlogs.filter(blog => !displayedBlogs.includes(blog));
+        const newBlogs = getRandomBlogs(remainingBlogs, Math.min(5, remainingBlogs.length));
+        displayedBlogs = [...displayedBlogs, ...newBlogs];
+        renderBlogs(newBlogs);
+
+        // अगर कोई और ब्लॉग नहीं बचा, तो बटन छिपाएँ
+        if (displayedBlogs.length >= allBlogs.length) {
+          loadMoreBtn.style.display = 'none';
+        }
+
+        loadMoreBtn.disabled = false;
+        spinner.classList.remove('active');
+      }, 1000); // 1 सेकंड का डिले लोडिंग सिमुलेशन के लिए
+    });
   </script>
 </body>
   </html>
