@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>philoshphy of everything</title>
+  <title>ब्लॉग वेबसाइट</title>
   <style>
     /* रिसेट और बेसिक स्टाइल */
     * {
@@ -16,6 +16,7 @@
       background-color: #f4f4f4;
       color: #333;
       line-height: 1.6;
+      overflow-x: hidden; /* होरिजॉन्टल स्क्रॉल रोकने के लिए */
     }
     a {
       text-decoration: none;
@@ -51,7 +52,7 @@
     .sidebar {
       background: #1a1a1a;
       color: white;
-      width: 70px; /* डिफॉल्ट स्लिम */
+      width: 70px;
       height: 100vh;
       position: fixed;
       top: 0;
@@ -62,7 +63,7 @@
       overflow: hidden;
     }
     .sidebar:hover {
-      width: 200px; /* होवर पर विस्तार */
+      width: 200px;
     }
     .sidebar ul {
       list-style: none;
@@ -97,8 +98,9 @@
 
     /* मुख्य कंटेंट */
     .main-content {
-      margin-left: 70px; /* साइडबार की डिफॉल्ट चौड़ाई */
-      padding: 80px 20px 20px;
+      margin-left: 70px;
+      padding: 80px 20px 80px; /* फुटर के लिए नीचे पैडिंग */
+      min-height: 100vh; /* पूरे स्क्रीन की हाइट */
       transition: margin-left 0.3s ease;
     }
     .container {
@@ -112,8 +114,9 @@
     }
     .blog-list {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
+      padding-bottom: 20px;
     }
     .blog-card {
       background: white;
@@ -121,6 +124,9 @@
       overflow: hidden;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+      height: 100%; /* कार्ड पूरी हाइट ले */
     }
     .blog-card:hover {
       transform: translateY(-5px);
@@ -129,11 +135,15 @@
     .blog-image {
       width: 100%;
       aspect-ratio: 16 / 9;
-      object-fit: cover;
+      object-fit: cover; /* YouTube थंबनेल की तरह फिट */
+      display: block;
       border-bottom: 2px solid #1a73e8;
     }
     .blog-content {
       padding: 15px;
+      flex-grow: 1; /* कंटेंट को बाकी स्पेस लेने दें */
+      display: flex;
+      flex-direction: column;
     }
     .blog-title {
       font-size: 1.5rem;
@@ -148,6 +158,7 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
+      flex-grow: 1;
     }
 
     /* फुटर */
@@ -176,14 +187,15 @@
         transform: translateX(0);
       }
       .sidebar:hover {
-        width: 250px; /* मोबाइल पर होवर इफेक्ट नहीं */
+        width: 250px;
       }
       .sidebar .text {
-        opacity: 1; /* मोबाइल पर टेक्स्ट हमेशा दिखे */
+        opacity: 1;
       }
       .main-content {
         margin-left: 0;
         padding-top: 60px;
+        padding-bottom: 80px; /* फुटर के लिए */
       }
       header {
         padding: 10px 15px;
@@ -191,13 +203,19 @@
       .logo {
         font-size: 1.2rem;
       }
+      .blog-list {
+        grid-template-columns: 1fr; /* मोबाइल पर सिंगल कॉलम */
+      }
+      .blog-card {
+        max-width: 100%; /* मोबाइल पर फुल-व्हिड्थ */
+      }
     }
   </style>
 </head>
 <body>
   <!-- हेडर -->
   <header>
-    <div class="logo">Just calm down</div>
+    <div class="logo">मेरा ब्लॉग</div>
     <div class="hamburger" id="hamburger">&#9776;</div>
   </header>
 
@@ -214,7 +232,7 @@
   <!-- मुख्य कंटेंट -->
   <main class="main-content">
     <div class="container">
-      <h1>😇</h1>
+      <h1>मेरे ब्लॉग</h1>
       <div class="blog-list" id="blogList"></div>
     </div>
   </main>
@@ -255,4 +273,4 @@
       .catch(error => console.error('Error fetching data:', error));
   </script>
 </body>
-</html>
+  </html>
